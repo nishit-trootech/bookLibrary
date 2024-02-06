@@ -7,4 +7,4 @@ import { BooksController } from './books.controller';
   providers: [BooksService],
   exports: [BooksService],
 })
-export default class BooksModule {}
+export class BooksModule {}

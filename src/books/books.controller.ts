@@ -1,25 +1,48 @@
 // books.controller.ts
 
-import { Controller, Get, Param, Post, Body, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, Put, Delete, UseGuards, HttpStatus, Res, HttpException, UseFilters } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
-import { ApiBody, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/auth.guard';
+import { ResponseDto } from 'src/common/dto/response.dto';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import { HttpAdapterHost } from '@nestjs/core';
+import { CustomUnauthorizedExceptionFilter } from 'src/common/filters/custom-unauthorised-exception.filter';
 
 @Controller('books')
+@ApiTags('Books')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
+@UseFilters(CustomUnauthorizedExceptionFilter)
 export class BooksController {
-  constructor(private readonly booksService: BooksService) { }
+  httpAdapter: ExpressAdapter;
+  constructor(
+    private readonly booksService: BooksService,
+    private readonly httpAdapterHost: HttpAdapterHost<ExpressAdapter>,
+  ) {
+    this.httpAdapter = this.httpAdapterHost.httpAdapter;
+  }
 
   @Get()
   @ApiOperation({ summary: 'List All Books' })
-  async getAllBooks() {
-    return this.booksService.getAllBooks();
+  async getAllBooks(@Res({ passthrough: true }) res: Response) {
+    const books = await this.booksService.getAllBooks();
+
+    this.httpAdapter.status(res, HttpStatus.OK);
+
+    return new ResponseDto(HttpStatus.OK, 'List all books', books);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'List individual book based on id' })
-  async getBookById(@Param('id') id: number) {
-    return this.booksService.getBookById(id);
+  async getBookById(@Param('id') id: string, @Res({ passthrough: true }) res: Response) {
+    const book = await this.booksService.getBookById(id);
+
+    this.httpAdapter.status(res, HttpStatus.OK);
+
+    return new ResponseDto(HttpStatus.OK, 'Fetched book detail successfully', book);
   }
 
   @Post()
@@ -33,8 +56,11 @@ export class BooksController {
       },
     },
   })
-  async createBook(@Body() createBookDto: CreateBookDto) {
-    return this.booksService.createBook(createBookDto);
+  async createBook(@Body() createBookDto: CreateBookDto, @Res({ passthrough: true }) res: Response) {
+    const book = await this.booksService.createBook(createBookDto);
+    this.httpAdapter.status(res, HttpStatus.CREATED);
+
+    return new ResponseDto(HttpStatus.CREATED, 'Added new book successfully', book);
   }
 
   @Put(':id')
@@ -47,19 +73,20 @@ export class BooksController {
       },
     },
   })
-  async updateBookTitle(@Param('id') id: number, @Body() updateBookDto: UpdateBookDto) {
-    return this.booksService.updateBook(id, updateBookDto);
+  async updateBookTitle(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto, @Res({ passthrough: true }) res: Response) {
+    await this.booksService.updateBook(id, updateBookDto);
+
+    this.httpAdapter.status(res, HttpStatus.OK);
+
+    return new ResponseDto(HttpStatus.OK, 'Book details updated successfully', {});
   }
 
   @Delete(':id')
-  async deleteBook(@Param('id') id: number) {
+  async deleteBook(@Param('id') id: string, @Res({ passthrough: true }) res: Response) {
     const response = await this.booksService.deleteBook(id);
 
-    if(response) {
-      return {
-        "message": "Record Deleted successfully",
-        "statusCode": 200
-      }
-    }
+    this.httpAdapter.status(res, HttpStatus.OK);
+
+    return new ResponseDto(HttpStatus.OK, 'Record Deleted successfully', {});
   }
 }

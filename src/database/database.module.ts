@@ -1,6 +1,6 @@
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
-import {sequelizeOptions} from './sequelize.config';
+import { sequelizeOptions } from './database.config';
 
 export const sequelizeProviders = [
   {

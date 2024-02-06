@@ -1,8 +1,11 @@
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from '@nestjs/common';
 import dotenv from "dotenv";
+import { CustomAllExceptionFilter } from './common/filters/custom-all-exception.filter';
+import { CustomNotFoundExceptionFilter } from './common/filters/custom-not-found-exception.filter';
+import { BadRequestExceptionFilter } from './common/filters/bad-request-exception.filter';
 dotenv.config();
 
 async function bootstrap() {
@@ -11,10 +14,19 @@ async function bootstrap() {
   });
 
   app.enableCors();
+
+  const { httpAdapter } = app.get(HttpAdapterHost);
+
+  app.useGlobalFilters(
+    new CustomAllExceptionFilter(),
+    new CustomNotFoundExceptionFilter(),
+    new BadRequestExceptionFilter(),
+  );
   const config = new DocumentBuilder()
     .setTitle('Books Store')
     .setDescription('Books Store API')
     .setVersion('v1')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

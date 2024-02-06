@@ -1,5 +1,30 @@
-// src/books/book.model.ts
+import { Column, DataType, Model, Table } from 'sequelize-typescript';
 
+
+@Table({ tableName: 'books', timestamps: true, underscored: false })
+export class Book extends Model<Book> {
+  @Column({
+    primaryKey: true,
+    allowNull: false,
+    type: DataType.UUID, // Use UUID type for id column
+    defaultValue: DataType.UUIDV4, // Automatically generate UUIDs
+  })
+  id: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  title: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  isbn: string;
+}
+
+/*
 import { Model, DataTypes } from 'sequelize';
 import sequelize  from '../database/sequelize.config'; // Import your Sequelize instance
 
@@ -41,3 +66,4 @@ Book.init(
 );
 
 export default Book;
+*/
