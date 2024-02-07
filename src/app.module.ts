@@ -7,7 +7,7 @@ import { BooksModule } from './books/books.module';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { sequelizeOptions } from './database/database.config';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthGuard } from './auth/auth.guard';
 
 @Module({
@@ -18,12 +18,12 @@ import { JwtAuthGuard } from './auth/auth.guard';
       signOptions: { expiresIn: '24h' }, // Optional: Set token expiration
     }),
     SequelizeModule.forRoot(sequelizeOptions),
-    UsersModule, 
-    AuthModule, 
-    BooksModule
+    UsersModule,
+    AuthModule,
+    BooksModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtAuthGuard],
-  exports: [JwtAuthGuard,JwtAuthGuard],
+  exports: [JwtAuthGuard, JwtAuthGuard],
 })
-export class AppModule { }
+export class AppModule {}

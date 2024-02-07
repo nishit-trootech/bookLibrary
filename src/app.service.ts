@@ -1,14 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto, LoginDto } from './users/dto/create-user.dto';
-import { User } from './models/user.model';
-import { JwtService } from '@nestjs/jwt';
-import { Op } from 'sequelize';
-import bcrypt from 'bcrypt';
-
+import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AppService {
-
-  constructor(private readonly jwtService: JwtService) {}
+  constructor() {}
 
   getHello(): string {
     return 'Hello World!';

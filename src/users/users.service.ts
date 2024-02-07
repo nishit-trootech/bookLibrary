@@ -1,5 +1,11 @@
-import { HttpException, HttpStatus, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { CreateUserDto, FetchUserProfileDto, UpdateUserProfileDto } from './dto/create-user.dto';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
+import { UpdateUserProfileDto } from './dto/users.dto';
 import { User } from 'src/models/user.model';
 
 @Injectable()
@@ -18,17 +24,19 @@ export class UsersService {
     }
   }
 
-  async updateUserProfile(userId: string, updateUserProfileDto: UpdateUserProfileDto): Promise<any> {
+  async updateUserProfile(
+    userId: string,
+    updateUserProfileDto: UpdateUserProfileDto,
+  ): Promise<[number]> {
     const user = await User.findByPk(userId);
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
     try {
-      const response = await User.update(
-        updateUserProfileDto,
-        { where: { id: userId } }
-      );
+      const response = await User.update(updateUserProfileDto, {
+        where: { id: userId },
+      });
 
       return response;
     } catch (error) {
@@ -40,4 +48,3 @@ export class UsersService {
     }
   }
 }
-

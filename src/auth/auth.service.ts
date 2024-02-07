@@ -1,14 +1,20 @@
-import { HttpException, HttpStatus, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
 import { User } from 'src/models/user.model';
-import { CreateUserDto, LoginDto } from 'src/users/dto/create-user.dto';
+import { CreateUserDto, LoginDto } from 'src/users/dto/users.dto';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
-  constructor(private readonly jwtService: JwtService) { }
+  constructor(private readonly jwtService: JwtService) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     try {
@@ -30,16 +36,16 @@ export class AuthService {
 
     if (isEmail) {
       whereConditions.push({
-        email: usernameOrEmail
+        email: usernameOrEmail,
       });
     } else {
       whereConditions.push({
-        username: usernameOrEmail
+        username: usernameOrEmail,
       });
     }
 
     const findUser = await User.findOne({
-      where: { [Op.or]: whereConditions }
+      where: { [Op.or]: whereConditions },
     });
 
     if (!findUser) {
@@ -60,7 +66,11 @@ export class AuthService {
   }
 
   async generateToken(user: any) {
-    const payload = { username: user.username, email: user.email, sub: user.id };
+    const payload = {
+      username: user.username,
+      email: user.email,
+      sub: user.id,
+    };
     try {
       return this.jwtService.sign(payload);
     } catch (error) {

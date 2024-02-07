@@ -1,6 +1,13 @@
-import { Body, Controller, HttpStatus, Post, Res, UseFilters } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpStatus,
+  Post,
+  Res,
+  UseFilters,
+} from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateUserDto, LoginDto } from 'src/users/dto/create-user.dto';
+import { CreateUserDto, LoginDto } from 'src/users/dto/users.dto';
 import { AuthService } from './auth.service';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { HttpAdapterHost } from '@nestjs/core';
@@ -31,7 +38,10 @@ export class AuthController {
       },
     },
   })
-  async signUp(@Body() createUserDto: CreateUserDto, @Res({ passthrough: true }) res: Response) {
+  async signUp(
+    @Body() createUserDto: CreateUserDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const user = await this.authService.createUser(createUserDto);
 
     this.httpAdapter.status(res, HttpStatus.OK);
@@ -50,12 +60,14 @@ export class AuthController {
       },
     },
   })
-  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const token = await this.authService.validateUser(loginDto);
 
     this.httpAdapter.status(res, HttpStatus.OK);
 
     return new ResponseDto(HttpStatus.OK, 'Logged In successfully', { token });
   }
-
 }
