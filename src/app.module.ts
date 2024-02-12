@@ -9,12 +9,13 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { sequelizeOptions } from './database/database.config';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthGuard } from './auth/auth.guard';
-
+import dotenv from 'dotenv';
+dotenv.config();
 @Module({
   imports: [
     ConfigModule.forRoot(),
     JwtModule.register({
-      secret: 'my-secret-key', // Use environment variable or fallback to a default value
+      secret: process.env.JWT_SECRET_KEY, // Use environment variable or fallback to a default value
       signOptions: { expiresIn: '24h' }, // Optional: Set token expiration
     }),
     SequelizeModule.forRoot(sequelizeOptions),
